@@ -1,5 +1,7 @@
 -module(hashids).
--export([new/0, new/1, encode/2, decode/2]).
+-export([new/0, new/1, 
+         encode/2, decode/2, 
+         salt/1, alphabet/1, min_hash_length/1]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -30,19 +32,17 @@
 -define(DEFAULT_SEPS,         "cfhistuCFHISTU").
 
 %% @doc make a new hashids context (convenient function)
-%% @spec new() -> hashids_context().
 -spec new() -> hashids_context().
 new() ->
     new([]).
 
 %% @doc make a new hashids context
-%% @spec new([] | [{salt | default_alphabet | min_hash_length, any()}]) -> hashids_context().
 -spec new([] | [{salt | default_alphabet | min_hash_length, any()}]) -> hashids_context().
 new(Opts) ->
     Salt            = get_value(salt, Opts, []),
     NotUniqAlphabet = get_value(default_alphabet, Opts, ?DEFAULT_ALPHABET),
     MinHashLength   = erlang:max(get_value(min_hash_length, Opts, 0), 0),
-    
+
     % validate options
     Alphabet = unique(NotUniqAlphabet),
     
@@ -62,7 +62,6 @@ new(Opts) ->
     }.
 
 %% @doc encode numbers 
-%% @spec encode(hashids_context(), integer() | [integer(), ...]) -> string().
 -spec encode(hashids_context(), integer() | [integer(), ...]) -> string().
 encode(_, N) when is_integer(N), N < 0  ->
     "";
@@ -75,13 +74,28 @@ encode(Context, N) when is_list(N) ->
     end.
 
 %% @doc decode hash string
-%% @spec -spec decode(hashids_context(), string()) -> [integer(), ...].
 -spec decode(hashids_context(), string()) -> [integer(), ...].
 decode(_, []) ->
     "";
 decode(Context, HashStr) when is_list(HashStr) ->
     internal_decode(Context, HashStr).
 
+%% @doc returns salt from context
+-spec salt(hashids_context()) -> string().
+salt(Context) when is_record(Context, hashids_context) ->
+    Context#hashids_context.salt.
+
+
+%% @doc returns adjusted custom alphabet from context
+-spec alphabet(hashids_context()) -> string().
+alphabet(Context) when is_record(Context, hashids_context) ->
+    Context#hashids_context.alphabet.
+
+
+%% @doc returns minimum hash length from context
+-spec min_hash_length(hashids_context()) -> non_neg_integer().
+min_hash_length(Context) when is_record(Context, hashids_context) ->
+    Context#hashids_context.min_length.
 
 %% ===================================================================
 %% Private
@@ -122,7 +136,7 @@ pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
                                     Alpha1  = consistent_shuffle(Alpha, lists:sublist(Buf, 1, length(Alpha))),
                                     Last    = hash(E, Alpha1),
 
-                                    R1      = R0 ++ Last,
+                                    R1      = R0 ++ Last,      
                                     
                                     if  (I + 1) < length(N) ->
                                             E1 = E rem (lists:nth(1, Last) + I),
@@ -185,7 +199,7 @@ breakdown_index(2) -> 2;
 breakdown_index(_) -> 1.
 
 
-decode_breakdown_hash([], _, _, _) ->
+decode_breakdown_hash(Breakdown, _, _, _) when length(Breakdown) == 0 ->
     [];
 decode_breakdown_hash(Breakdown, Salt, Seps, Alphabet) when is_list(Breakdown), length(Breakdown) > 0 ->
     [Lottery | T] = Breakdown,
@@ -273,6 +287,8 @@ hash_numbers(Numbers) when is_list(Numbers) ->
     HashInt.
 
 
+hash(0, Alphabet) ->
+    [lists:nth(1, Alphabet)];
 hash(Input, Alphabet) ->
     hash_loop(Input, Alphabet, []).
 
@@ -346,8 +362,6 @@ swap(List, S1, S2) ->
     List4 ++ [F | List5].
 
 
-ceiling(X) when X < 0 ->
-    trunc(X);
 ceiling(X) ->
     T = trunc(X),
     case X - T == 0 of

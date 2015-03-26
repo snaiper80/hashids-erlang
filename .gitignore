@@ -2,3 +2,4 @@
 *.beam
 .eunit
 deps
+hashids_plt

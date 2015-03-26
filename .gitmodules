@@ -1,0 +1,3 @@
+[submodule "deps/hashids_test_suites"]
+	path = deps/hashids_test_suites
+	url = https://github.com/alco/hashids-test-suite.git

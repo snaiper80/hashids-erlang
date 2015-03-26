@@ -29,6 +29,7 @@ compile:
 clean:
 	@rm -rf ./.eunit
 	@rm -rf ./.rebar
+	@rm -rf ./ebin
 	@$(REBAR) clean
 
 test:

@@ -1,6 +1,6 @@
 {application, hashids, [
     {description, "Hashids for erlang"},
-    {vsn, "0.0.1"},
+    {vsn, git},
     {registered, []},
     {applications, [kernel, stdlib]}
 ]}.
