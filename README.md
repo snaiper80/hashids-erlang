@@ -1,3 +1,5 @@
+# ![hashids](http://www.hashids.org.s3.amazonaws.com/public/img/hashids.png "Hashids")
+
 Hashids
 =======
 
