@@ -204,7 +204,7 @@ consistent_shuffle_test_() ->
             "consistent_shuffle function Tests",
             setup, fun() -> ok end,
             fun teardown/1,
-            fun(Ctx) ->
+            fun(_) ->
                     [ 
                         ?_assertMatch(?DEFAULT_ALPHABET, hashids:consistent_shuffle(?DEFAULT_ALPHABET, "")),
 
