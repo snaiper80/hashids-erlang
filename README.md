@@ -2,6 +2,7 @@
 
 Hashids
 =======
+[![Build status](https://travis-ci.org/snaiper80/hashids-erlang.svg "Build status")](https://travis-ci.org/snaiper80/hashids-erlang)
 
 The [Erlang][1] port of [Hashids][2] from JavaScript.
 
