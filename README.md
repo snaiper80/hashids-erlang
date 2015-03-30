@@ -10,6 +10,17 @@ The [Erlang][1] port of [Hashids][2] from JavaScript.
   [2]: http://www.hashids.org/
 
 
+## Installation
+
+Add Hashids as a dependency to rebar.config
+```erlang
+{deps,
+    [
+        {hashids, ".*",  {git, "git://github.com/snaiper80/hashids-erlang.git",  {tag, "1.0.0"}}}}}
+    ]
+}.
+```
+
 ## Usage
 
 Hashids encodes a integer or a list of integers.
@@ -37,7 +48,7 @@ Hashids encodes a integer or a list of integers.
 "Y9awcOLv"
 ```
 
-decode/2 returns a list of numbers 
+decode/2 returns a list of numbers
 
 ```erlang
 6> hashids:decode(Ctx, Encoded).
@@ -50,7 +61,7 @@ decode/2 returns a list of numbers
 You can use customized characters (least 16 characters long)
 
 ```erlang
-Ctx = hashids:new([{salt, "this is my salt"}, 
+Ctx = hashids:new([{salt, "this is my salt"},
                    {min_hash_length, 8}, {default_alphabet, "ABCDEFGhijklmn34567890-:"}]).
 ```
 
