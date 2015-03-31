@@ -1,6 +1,6 @@
 -module(hashids).
--export([new/0, new/1, 
-         encode/2, decode/2, 
+-export([new/0, new/1,
+         encode/2, decode/2,
          salt/1, alphabet/1, min_hash_length/1]).
 
 -ifdef(TEST).
@@ -45,7 +45,7 @@ new(Opts) ->
 
     % validate options
     Alphabet = unique(NotUniqAlphabet),
-    
+
     valid = validate_alphabet(Alphabet),
     ok    = validate_salt(Salt),
 
@@ -61,7 +61,7 @@ new(Opts) ->
         guards     = Guards
     }.
 
-%% @doc encode numbers 
+%% @doc encode numbers
 -spec encode(hashids_context(), integer() | [integer(), ...]) -> string().
 encode(_, N) when is_integer(N), N < 0  ->
     "";
@@ -110,22 +110,21 @@ internal_encode(#hashids_context { salt       = Salt,
 
     HashInt            = hash_numbers(N),
     {FinalAlphabet, R} = pre_encode(N, HashInt, Salt, Alphabet, Seps),
+    ExtendedR          = try_extend_encoded(1, R, HashInt, MinHashLength, Guards),
 
-    NewR =  if  length(R) < MinHashLength ->
-                HT = (HashInt + lists:nth(1, R)) rem length(Guards),
-                NR = [lists:nth(HT + 1, Guards)] ++ R,
+    post_encode(ExtendedR, FinalAlphabet, MinHashLength).
 
-                if  length(NR) < MinHashLength ->
-                        HT1 = (HashInt + lists:nth(3, NR)) rem length(Guards),
-                        NR ++ [lists:nth(HT1 + 1, Guards)];
-                    true ->
-                        NR
-                end;
-            true ->
-                R
-    end,
 
-    post_encode(NewR, FinalAlphabet, MinHashLength).
+try_extend_encoded(1, R, HashInt, MinHashLength, Guards) when length(R) < MinHashLength ->
+    try_extend_encoded(2, [pick_char_from_guards(1, R, HashInt, Guards)] ++ R, HashInt, MinHashLength, Guards);
+try_extend_encoded(2, R, HashInt, MinHashLength, Guards) when length(R) < MinHashLength ->
+    try_extend_encoded(3, R ++ [pick_char_from_guards(3, R, HashInt, Guards)], HashInt, MinHashLength, Guards);
+try_extend_encoded(_, R, _, _, _) ->
+    R.
+
+pick_char_from_guards(Index, R, HashInt, Guards) ->
+    HT = (HashInt + lists:nth(Index, R)) rem length(Guards),
+    lists:nth(HT + 1, Guards).
 
 
 pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
@@ -136,8 +135,8 @@ pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
                                     Alpha1  = consistent_shuffle(Alpha, lists:sublist(Buf, 1, length(Alpha))),
                                     Last    = hash(E, Alpha1),
 
-                                    R1      = R0 ++ Last,      
-                                    
+                                    R1      = R0 ++ Last,
+
                                     if  (I + 1) < length(N) ->
                                             E1 = E rem (lists:nth(1, Last) + I),
                                             R2 = R1 ++ [lists:nth((E1 rem length(Seps)) + 1, Seps)];
@@ -155,8 +154,8 @@ post_encode(R, Alphabet, MinHashLength) when length(R) < MinHashLength ->
     HalfLen           = length(Alphabet) div 2,
     ShuffledAlphabet  = consistent_shuffle(Alphabet, Alphabet),
 
-    R2 = lists:sublist(ShuffledAlphabet, HalfLen + 1, length(ShuffledAlphabet) - HalfLen) ++ 
-         R ++ 
+    R2 = lists:sublist(ShuffledAlphabet, HalfLen + 1, length(ShuffledAlphabet) - HalfLen) ++
+         R ++
          lists:sublist(ShuffledAlphabet, 1, HalfLen),
 
     Excess = length(R2) - MinHashLength,
@@ -166,12 +165,13 @@ post_encode(R, Alphabet, MinHashLength) when length(R) < MinHashLength ->
 post_encode(R, _, _) ->
     R.
 
+
 internal_decode(#hashids_context { salt       = Salt,
                                    alphabet   = Alphabet,
                                    seperators = Seps,
                                    guards     = Guards} = Context, HashStr) ->
-    
-    HashBreakdown = replace_chars_with_whitespace_in(Guards, HashStr),
+
+    HashBreakdown = replace_chars_with_whitespace_in_list(Guards, HashStr),
     HashArray     = string:tokens(HashBreakdown, " "),
 
     Breakdown = lists:nth(breakdown_index(length(HashArray)), HashArray),
@@ -185,8 +185,8 @@ internal_decode(#hashids_context { salt       = Salt,
     end.
 
 
-replace_chars_with_whitespace_in(Check, Replace) when is_list(Check), is_list(Replace) ->
-    lists:map(fun(E) -> 
+replace_chars_with_whitespace_in_list(Check, Replace) when is_list(Check), is_list(Replace) ->
+    lists:map(fun(E) ->
         case lists:member(E, Check) of
             true -> $\ ;
             _    ->  E
@@ -203,12 +203,12 @@ decode_breakdown_hash(Breakdown, _, _, _) when length(Breakdown) == 0 ->
     [];
 decode_breakdown_hash(Breakdown, Salt, Seps, Alphabet) when is_list(Breakdown), length(Breakdown) > 0 ->
     [Lottery | T] = Breakdown,
-    
-    Replaced = replace_chars_with_whitespace_in(Seps, T),
-    {_, R}   = lists:foldl( fun(E, {Alpha, Acc}) -> 
+
+    Replaced = replace_chars_with_whitespace_in_list(Seps, T),
+    {_, R}   = lists:foldl( fun(E, {Alpha, Acc}) ->
                                 Buf    = [Lottery] ++ Salt ++ Alpha,
                                 Alpha1 = consistent_shuffle(Alpha, lists:sublist(Buf, 1, length(Alpha))),
-                                    
+
                                 {Alpha1, [unhash(E, Alpha1) | Acc]}
 
                             end, {Alphabet, []}, string:tokens(Replaced, " ")),
@@ -240,7 +240,7 @@ validate_salt(Salt) when is_list(Salt) -> ok;
 validate_salt(_)                       -> {error, invalid_salt}.
 
 
-setup_sep(Alphabet, Salt) -> 
+setup_sep(Alphabet, Salt) ->
     % seps should contain only characters present in alphabet; alphabet should not contains seps
     {NotIn, In}        = lists:partition(fun(S) -> lists:member(S, Alphabet) end, ?DEFAULT_SEPS),
     UnshuffledAlphabet = lists:subtract(Alphabet, NotIn),
@@ -253,9 +253,9 @@ setup_sep(Alphabet, Salt) ->
     {AdjustedSeps, ShuffledAlphabet}.
 
 
-calculate_seps(Seps, Alphabet) when length(Alphabet) == 0; 
+calculate_seps(Seps, Alphabet) when length(Alphabet) == 0;
                                     length(Alphabet) div length(Seps) > ?SEP_DIV ->
-    
+
     SepLength = ceiling(length(Alphabet) / ?SEP_DIV),
     Length = case SepLength of
                     1 -> 2;
@@ -329,7 +329,7 @@ get_value(Key, Opts, Default) ->
 
 unique([])      -> [];
 unique([H | T]) -> [H | [X || X <- unique(T), X =/= H]].
-    
+
 
 consistent_shuffle(Alphabet, []) ->
     Alphabet;
@@ -339,7 +339,7 @@ consistent_shuffle(Alphabet, Salt) ->
     {Shuffled, _, _, _}  =  lists:foldr(
                                 fun(_, {_, _, _, 0} = Acc) ->
                                         Acc;
-                                   (_, {Al, V, P, L}) -> 
+                                   (_, {Al, V, P, L}) ->
                                         V1 = V rem SaltLength,
                                         N  = lists:nth(V1 + 1, Salt),
                                         P1 = P + N,
@@ -354,11 +354,11 @@ consistent_shuffle(Alphabet, Salt) ->
     Shuffled.
 
 
-swap(List, S1, S2) -> 
+swap(List, S1, S2) ->
     {List2, [F | List3]} = lists:split(S1, List),
     LT                   = List2 ++ [lists:nth(S2 + 1, List) | List3],
     {List4, [_ | List5]} = lists:split(S2, LT),
-    
+
     List4 ++ [F | List5].
 
 
