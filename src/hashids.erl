@@ -179,20 +179,19 @@ internal_decode(#hashids_context { salt       = Salt,
     Result    = decode_breakdown_hash(Breakdown, Salt, Seps, Alphabet),
 
     case encode(Context, Result) of
-        HashStr ->
-            Result;
-        _ ->
-            []
+        HashStr -> Result;
+        _       -> []
     end.
 
 
 replace_chars_with_whitespace_in_list(Check, Replace) when is_list(Check), is_list(Replace) ->
-    lists:map(fun(E) ->
-        case lists:member(E, Check) of
-            true -> $\ ;
-            _    ->  E
-        end
-    end, Replace).
+    [replace_whitespace_if_member(V, Check) || V <- Replace].
+
+replace_whitespace_if_member(E, Check) ->
+    case lists:member(E, Check) of
+        true -> $\s;
+        _    -> E
+    end.
 
 
 breakdown_index(3) -> 2;
@@ -224,17 +223,13 @@ validate_alphabet(Alphabet) when is_list(Alphabet) ->
 
     valid.
 
-check_alphabet_len(Alphabet) when length(Alphabet) < ?MIN_ALPHABET_LEN ->
-    {error, too_short_alphabet};
-check_alphabet_len(_) ->
-    ok.
+check_alphabet_len(Alphabet) when length(Alphabet) < ?MIN_ALPHABET_LEN -> {error, too_short_alphabet};
+check_alphabet_len(_)                                                  -> ok.
 
 contains_space_in_alphabet(Alphabet) ->
-    case lists:member($\ , Alphabet) of
-        true ->
-            {error, alphabet_error};
-        false ->
-            ok
+    case lists:member($\s, Alphabet) of
+        true  -> {error, alphabet_error};
+        false -> ok
     end.
 
 
@@ -245,8 +240,8 @@ validate_salt(_)                       -> {error, invalid_salt}.
 setup_sep(Alphabet, Salt) ->
     % seps should contain only characters present in alphabet; alphabet should not contains seps
     {NotIn, In}        = lists:partition(fun(S) -> lists:member(S, Alphabet) end, ?DEFAULT_SEPS),
-    UnshuffledAlphabet = lists:subtract(Alphabet, NotIn),
-    UnshuffledSeps     = lists:subtract(?DEFAULT_SEPS, In),
+    UnshuffledAlphabet = Alphabet -- NotIn,
+    UnshuffledSeps     = ?DEFAULT_SEPS -- In,
 
     Seps                               = consistent_shuffle(UnshuffledSeps, Salt),
     {AdjustedSeps, AdjustedAlphabet}   = calculate_seps(Seps, UnshuffledAlphabet),
@@ -256,7 +251,7 @@ setup_sep(Alphabet, Salt) ->
 
 
 calculate_seps(Seps, Alphabet) when length(Alphabet) == 0;
-                                    length(Alphabet) div length(Seps) > ?SEP_DIV ->
+                                    length(Alphabet) div length(Seps) > (?SEP_DIV) ->
 
     SepLength = ceiling(length(Alphabet) / ?SEP_DIV),
     Length = case SepLength of
@@ -266,7 +261,7 @@ calculate_seps(Seps, Alphabet) when length(Alphabet) == 0;
 
     Diff = Length - length(Seps),
     if  Diff > 0 ->
-            {lists:append(Seps, lists:sublist(Alphabet, Diff)), lists:sublist(Alphabet, Diff + 1, length(Alphabet) - Diff) };
+            {Seps ++ lists:sublist(Alphabet, Diff), lists:sublist(Alphabet, Diff + 1, length(Alphabet) - Diff) };
         true ->
             {lists:sublist(Seps, 1, Length), Alphabet}
     end;
@@ -289,10 +284,8 @@ hash_numbers(Numbers) when is_list(Numbers) ->
     HashInt.
 
 
-hash(0, Alphabet) ->
-    [lists:nth(1, Alphabet)];
-hash(Input, Alphabet) ->
-    hash_loop(Input, Alphabet, []).
+hash(0, Alphabet)     -> [lists:nth(1, Alphabet)];
+hash(Input, Alphabet) -> hash_loop(Input, Alphabet, []).
 
 
 hash_loop(0, _, Acc) ->
@@ -303,8 +296,7 @@ hash_loop(N, Alphabet, Acc) ->
 
 
 unhash(Input, Alphabet) ->
-    {ok, Num} = unhash_loop(Alphabet, Input, 1, 0),
-    Num.
+    {ok, Num} = unhash_loop(Alphabet, Input, 1, 0), Num.
 
 unhash_loop(_, Input, I, Num) when I > length(Input)->
     {ok, Num};
