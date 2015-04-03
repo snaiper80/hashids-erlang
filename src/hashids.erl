@@ -129,9 +129,10 @@ pick_char_from_guards(Index, R, HashInt, Guards) ->
 
 pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
     Lottery = lists:nth(HashInt rem length(Alphabet) + 1, Alphabet),
+    PreBuf  = [Lottery] ++ Salt,
 
     {FinalAlphabet, R, _} = lists:foldl(fun(E, {Alpha, R0, I}) ->
-                                    Buf     = [Lottery] ++ Salt ++ Alpha,
+                                    Buf     = PreBuf ++ Alpha,
                                     Alpha1  = consistent_shuffle(Alpha, lists:sublist(Buf, 1, length(Alpha))),
                                     Last    = hash(E, Alpha1),
 
@@ -203,10 +204,11 @@ decode_breakdown_hash(Breakdown, _, _, _) when length(Breakdown) == 0 ->
     [];
 decode_breakdown_hash(Breakdown, Salt, Seps, Alphabet) when is_list(Breakdown), length(Breakdown) > 0 ->
     [Lottery | T] = Breakdown,
+    PreBuf        = [Lottery] ++ Salt,
 
     Replaced = replace_chars_with_whitespace_in_list(Seps, T),
     {_, R}   = lists:foldl( fun(E, {Alpha, Acc}) ->
-                                Buf    = [Lottery] ++ Salt ++ Alpha,
+                                Buf    = PreBuf ++ Alpha,
                                 Alpha1 = consistent_shuffle(Alpha, lists:sublist(Buf, 1, length(Alpha))),
 
                                 {Alpha1, [unhash(E, Alpha1) | Acc]}
