@@ -32,11 +32,13 @@
 -define(DEFAULT_SEPS,         "cfhistuCFHISTU").
 
 %% @doc make a new hashids context (convenient function)
+%% @spec new() -> hashids_context()
 -spec new() -> hashids_context().
 new() ->
     new([]).
 
 %% @doc make a new hashids context
+%% @spec new([] | [{salt | default_alphabet | min_hash_length, any()}]) -> hashids_context()
 -spec new([] | [{salt | default_alphabet | min_hash_length, any()}]) -> hashids_context().
 new(Opts) ->
     Salt            = get_value(salt, Opts, []),
@@ -62,6 +64,7 @@ new(Opts) ->
     }.
 
 %% @doc encode numbers
+%% @spec encode(hashids_context(), integer() | [integer(), ...]) -> string()
 -spec encode(hashids_context(), integer() | [integer(), ...]) -> string().
 encode(_, N) when is_integer(N), N < 0  ->
     "";
@@ -74,6 +77,7 @@ encode(Context, N) when is_list(N) ->
     end.
 
 %% @doc decode hash string
+%% @spec decode(hashids_context(), string()) -> [integer(), ...]
 -spec decode(hashids_context(), string()) -> [integer(), ...].
 decode(_, []) ->
     "";
@@ -81,18 +85,21 @@ decode(Context, HashStr) when is_list(HashStr) ->
     internal_decode(Context, HashStr).
 
 %% @doc returns salt from context
+%% @spec salt(hashids_context()) -> string()
 -spec salt(hashids_context()) -> string().
 salt(Context) when is_record(Context, hashids_context) ->
     Context#hashids_context.salt.
 
 
 %% @doc returns adjusted custom alphabet from context
+%% @spec alphabet(hashids_context()) -> string()
 -spec alphabet(hashids_context()) -> string().
 alphabet(Context) when is_record(Context, hashids_context) ->
     Context#hashids_context.alphabet.
 
 
 %% @doc returns minimum hash length from context
+%% @spec min_hash_length(hashids_context()) -> non_neg_integer()
 -spec min_hash_length(hashids_context()) -> non_neg_integer().
 min_hash_length(Context) when is_record(Context, hashids_context) ->
     Context#hashids_context.min_length.
@@ -128,8 +135,9 @@ pick_char_from_guards(Index, R, HashInt, Guards) ->
 
 
 pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
-    Lottery = lists:nth(HashInt rem length(Alphabet) + 1, Alphabet),
-    PreBuf  = [Lottery] ++ Salt,
+    Lottery    = lists:nth(HashInt rem length(Alphabet) + 1, Alphabet),
+    PreBuf     = [Lottery] ++ Salt,
+    SepsLength = length(Seps),
 
     {FinalAlphabet, R, _} = lists:foldl(fun(E, {Alpha, R0, I}) ->
                                     Buf     = PreBuf ++ Alpha,
@@ -140,7 +148,7 @@ pre_encode(N, HashInt, Salt, Alphabet, Seps) ->
 
                                     if  (I + 1) < length(N) ->
                                             E1 = E rem (lists:nth(1, Last) + I),
-                                            R2 = R1 ++ [lists:nth((E1 rem length(Seps)) + 1, Seps)];
+                                            R2 = R1 ++ [lists:nth((E1 rem SepsLength) + 1, Seps)];
                                         true ->
                                             R2 = R1
                                     end,
@@ -280,8 +288,7 @@ calculate_guard(GC, Seps, Alphabet) ->
 
 
 hash_numbers(Numbers) when is_list(Numbers) ->
-    {HashInt, _} = lists:foldl(fun(Ele, {H, I}) -> {H + (Ele rem (I + 100)), I + 1} end, {0, 0}, Numbers),
-    HashInt.
+    {HashInt, _} = lists:foldl(fun(Ele, {H, I}) -> {H + (Ele rem (I + 100)), I + 1} end, {0, 0}, Numbers), HashInt.
 
 
 hash(0, Alphabet)     -> [lists:nth(1, Alphabet)];

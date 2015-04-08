@@ -16,7 +16,7 @@ REBAR = ./rebar -C $(rebar_config)
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
-.PHONY: all deps clean test coverage typer build_plt analysis
+.PHONY: all deps clean distclean test coverage typer build_plt analysis edoc
 
 all: deps compile
 
@@ -31,6 +31,9 @@ clean:
 	@rm -rf ./.rebar
 	@rm -rf ./ebin
 	@$(REBAR) clean
+
+distclean: clean
+	@$(REBAR) delete-deps
 
 test:
 	@rm -rf .eunit
@@ -48,3 +51,7 @@ build_plt:
 
 analysis:
 	@dialyzer --src ./src --plts $(DEPS_PLT) -Wunmatched_returns -Werror_handling -Wrace_conditions -Wno_behaviours -Wunderspecs
+
+edoc:
+	rm -rf ./doc
+	@$(REBAR) skip_deps=true doc
