@@ -1,6 +1,7 @@
 -module(hashids).
 -export([new/0, new/1,
          encode/2, decode/2,
+         encode_hex/2, decode_hex/2,
          salt/1, alphabet/1, min_hash_length/1]).
 
 -ifdef(TEST).
@@ -76,6 +77,14 @@ encode(Context, N) when is_list(N) ->
         _    -> internal_encode(Context, N)
     end.
 
+
+%% @doc encode hex string
+%% @spec encode_hex(hashids_context(), string()) -> string()
+-spec encode_hex(hashids_context(), string()) -> string().
+encode_hex(Context, Str) when is_list(Str) ->
+    encode(Context, [list_to_integer([$1 | S], 16) || S <- parts(Str, 12)]).
+
+
 %% @doc decode hash string
 %% @spec decode(hashids_context(), string()) -> [integer(), ...]
 -spec decode(hashids_context(), string()) -> [integer(), ...].
@@ -83,6 +92,15 @@ decode(_, []) ->
     "";
 decode(Context, HashStr) when is_list(HashStr) ->
     internal_decode(Context, HashStr).
+
+
+%% @doc decode hash string to decoded hex string
+%% @spec decode_hex(hashids_context(), string()) -> string()
+-spec decode_hex(hashids_context(), string()) -> string().
+decode_hex(Context, HashStr) when is_list(HashStr) ->
+    DecodedNums = decode(Context, HashStr),
+    lists:concat([begin [_ | T] = integer_to_list(I, 16), T end || I <- DecodedNums]).
+
 
 %% @doc returns salt from context
 %% @spec salt(hashids_context()) -> string()
@@ -369,3 +387,20 @@ ceiling(X) ->
         true -> T;
         false -> T + 1
     end.
+
+
+parts(List, Max) ->
+     RevList = split_list(List, Max),
+     lists:foldl(fun(E, Acc) ->
+         [lists:reverse(E)|Acc]
+     end, [], RevList).
+
+split_list(List, Max) ->
+    element(1, lists:foldl(fun
+        (E, {[Buff|Acc], C}) when C < Max ->
+            {[[E|Buff]|Acc], C+1};
+        (E, {[Buff|Acc], _}) ->
+            {[[E],Buff|Acc], 1};
+        (E, {[], _}) ->
+            {[[E]], 1}
+    end, {[], 0}, List)).

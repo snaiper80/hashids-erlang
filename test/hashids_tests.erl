@@ -18,28 +18,28 @@ setup_context_test_() ->
             setup, fun() -> ok end,
             fun teardown/1,
             fun(_) ->
-                    [ 
-                        ?_assertMatch({ hashids_context, [], 0, 
+                    [
+                        ?_assertMatch({ hashids_context, [], 0,
                                         "gjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890",
                                         "cfhistuCFHISTU",
                                         "abde"
                                       }, hashids:new()),
 
-                        ?_assertMatch({ hashids_context, "123", 16, 
+                        ?_assertMatch({ hashids_context, "123", 16,
                                         "9a645b8e72d",
                                         "fc01",
                                         "3"
-                                      }, hashids:new([{salt, "123"}, 
+                                      }, hashids:new([{salt, "123"},
                                                       {min_hash_length, 16},
                                                       {default_alphabet, "0123456789abcdef"}])),
 
-                        ?_assertMatch({ hashids_context, "this is my salt", 8, 
+                        ?_assertMatch({ hashids_context, "this is my salt", 8,
                                         "5N6y2rljDQak4xgzn8ZR1oKYLmJpEbVq3OBv9WwXPMe7",
                                         "UHuhtcITCsFifS",
                                         "AdG0"
                                       }, hashids:new([{salt, "this is my salt"}, {min_hash_length, 8}])),
 
-                        ?_assertMatch({ hashids_context, "", 0, 
+                        ?_assertMatch({ hashids_context, "", 0,
                                         "01",
                                         "fhistuCFHISTU",
                                         "c"
@@ -73,11 +73,12 @@ encode_test_() ->
             setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch("NkK9",                 hashids:encode(Ctx, 12345)),
                         ?_assertMatch("aBMswoO2UB3Sj",        hashids:encode(Ctx, [683, 94108, 123, 5])),
                         ?_assertMatch("1Wc8cwcE",             hashids:encode(Ctx, [5, 5, 5, 5])),
-                        ?_assertMatch("kRHnurhptKcjIDTWC3sx", hashids:encode(Ctx, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                        ?_assertMatch("kRHnurhptKcjIDTWC3sx", hashids:encode(Ctx, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])),
+                        ?_assertMatch("5x",                   hashids:encode(Ctx, 0))
                     ]
             end
         },
@@ -86,7 +87,7 @@ encode_test_() ->
             setup, fun() -> hashids:new() end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch("",                               hashids:encode(Ctx, -1)),
                         ?_assertMatch("",                               hashids:encode(Ctx, [10, -10])),
                         ?_assertMatch("jR",                             hashids:encode(Ctx, 1)),
@@ -103,7 +104,7 @@ encode_test_() ->
             setup, fun() -> hashids:new([{min_hash_length, 18}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch("J4q2VolejRejNmGQBW",             hashids:encode(Ctx, 1)),
                         ?_assertMatch("Q16nIJGnhxVRXtwovKu1ypq6hGV5o9", hashids:encode(Ctx, [4140, 21147, 115975, 678570, 4213597, 27644437]))
                     ]
@@ -114,7 +115,7 @@ encode_test_() ->
             setup, fun() -> hashids:new([{default_alphabet, "ABCDEFGhijklmn34567890-:"}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch(":mi8C8F7Am", hashids:encode(Ctx, [1,2,3,4,5]))
                     ]
             end
@@ -124,7 +125,7 @@ encode_test_() ->
             setup, fun() -> hashids:new() end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch("wpfLh9iwsqt0uyCEFjHM", hashids:encode(Ctx, lists:seq(1, 10)))                    ]
             end
         },
@@ -133,7 +134,7 @@ encode_test_() ->
             setup, fun() -> hashids:new() end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch("jR", hashids:encode(Ctx, 1)),
                         ?_assertMatch("k5", hashids:encode(Ctx, 2)),
                         ?_assertMatch("l5", hashids:encode(Ctx, 3)),
@@ -152,7 +153,7 @@ decode_test_() ->
             setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch([],                              hashids:decode(Ctx, "")),
                         ?_assertMatch([12345],                         hashids:decode(Ctx, "NkK9")),
                         ?_assertMatch([683, 94108, 123, 5],            hashids:decode(Ctx, "aBMswoO2UB3Sj")),
@@ -166,7 +167,7 @@ decode_test_() ->
             setup, fun() -> ok end,
             fun teardown/1,
             fun(_) ->
-                    [ 
+                    [
                         ?_assertMatch([12345], hashids:decode(hashids:new([{salt, "this is my salt"}]), "NkK9")),
                         ?_assertMatch([],      hashids:decode(hashids:new([{salt, "123456"}]),          "NkK9"))
                     ]
@@ -177,7 +178,7 @@ decode_test_() ->
             setup, fun() -> hashids:new([{salt, "this is my salt"}, {min_hash_length, 8}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertMatch([1],            hashids:decode(Ctx, "gB0NV05e")),
                         ?_assertMatch([25, 100, 950], hashids:decode(Ctx, "mxi8XH87")),
                         ?_assertMatch([5,200,195, 1], hashids:decode(Ctx, "KQcmkIW8hX"))
@@ -189,10 +190,59 @@ decode_test_() ->
             setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
             fun teardown/1,
             fun(Ctx) ->
-                    [ 
+                    [
                         ?_assertException(error,
                                           {badmatch, {error, cant_unhash}},
                                            hashids:decode(Ctx, "asdf-'"))
+                    ]
+            end
+        }
+    ].
+
+encode_decode_hex_test_() ->
+    [
+        {
+            "Encoding Hex String Tests",
+            setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
+            fun teardown/1,
+            fun(Ctx) ->
+                    [
+                        ?_assertMatch("",                         hashids:encode_hex(Ctx, "")),
+                        ?_assertMatch("lzY",                      hashids:encode_hex(Ctx, "FA")),
+                        ?_assertMatch("MemE",                     hashids:encode_hex(Ctx, "26dd")),
+                        ?_assertMatch("eBMrb",                    hashids:encode_hex(Ctx, "FF1A")),
+                        ?_assertMatch("D9NPE",                    hashids:encode_hex(Ctx, "12abC")),
+                        ?_assertMatch("9OyNW",                    hashids:encode_hex(Ctx, "185b0")),
+                        ?_assertMatch("MRWNE",                    hashids:encode_hex(Ctx, "17b8d")),
+                        ?_assertMatch("4o6Z7KqxE",                hashids:encode_hex(Ctx, "1d7f21dd38")),
+                        ?_assertMatch("ooweQVNB",                 hashids:encode_hex(Ctx, "20015111d")),
+                        ?_assertMatch("j436e8M4Mjfry18O4xnNcJV",  hashids:encode_hex(Ctx, "4f5ce2be8afa96092600000134")),
+                        ?_assertMatch("yNyaoWeKWVINWqvaM9bw",     hashids:encode_hex(Ctx, "507f191e810c19729de860ea"))
+
+                    ]
+            end
+        },
+        {
+            "Decoding HashString to hex string Tests",
+            setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
+            fun teardown/1,
+            fun(Ctx) ->
+                    [
+                        ?_assertMatch("",                            hashids:decode_hex(Ctx, "")),
+                        ?_assertMatch("FA",                          hashids:decode_hex(Ctx, "lzY")),
+                        ?_assertMatch("26DD",                        hashids:decode_hex(Ctx, "MemE")),
+                        ?_assertMatch("FF1A",                        hashids:decode_hex(Ctx, "eBMrb")),
+                        ?_assertMatch("4F5CE2BE8AFA96092600000134",  hashids:decode_hex(Ctx, "j436e8M4Mjfry18O4xnNcJV"))
+                    ]
+            end
+        },
+        {
+            "Encoding Hex String Tests BUT invalid hexstring",
+            setup, fun() -> hashids:new([{salt, "this is my salt"}]) end,
+            fun teardown/1,
+            fun(Ctx) ->
+                    [
+                        ?_assertException(error, badarg, hashids:encode_hex(Ctx, "HH"))
                     ]
             end
         }
@@ -205,7 +255,7 @@ consistent_shuffle_test_() ->
             setup, fun() -> ok end,
             fun teardown/1,
             fun(_) ->
-                    [ 
+                    [
                         ?_assertMatch(?DEFAULT_ALPHABET, hashids:consistent_shuffle(?DEFAULT_ALPHABET, "")),
 
                         ?_assertMatch("ba",    hashids:consistent_shuffle("ab", "this is my salt")),
@@ -216,7 +266,7 @@ consistent_shuffle_test_() ->
                         ?_assertMatch("f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV",
                                       hashids:consistent_shuffle(?DEFAULT_ALPHABET, "salt")),
 
-                        ?_assertMatch("fcaodykrgqvblxjwmtupzeisnh", 
+                        ?_assertMatch("fcaodykrgqvblxjwmtupzeisnh",
                                       hashids:consistent_shuffle("abcdefghijklmnopqrstuvwxyz",
                                       "this is my salt"))
                     ]
@@ -249,7 +299,7 @@ private_hash_unhash_test_() ->
             setup, fun() -> ok end,
             fun teardown/1,
             fun(_) ->
-                    [ 
+                    [
                         ?_assertMatch(59,         hashids:unhash("abbd", "abcdefg")),
                         ?_assertMatch(66,         hashids:unhash("abcd", "abcdefg")),
                         ?_assertMatch(100,        hashids:unhash("acac", "abcdefg")),
@@ -266,8 +316,8 @@ getter_test_() ->
     [
         {
             "getter Tests",
-            setup, fun() -> hashids:new([{salt, "this is my salt"}, 
-                                         {min_hash_length, 18}, 
+            setup, fun() -> hashids:new([{salt, "this is my salt"},
+                                         {min_hash_length, 18},
                                          {default_alphabet, "ABCDEFGhijklmn34567890-:"}]) end,
             fun teardown/1,
             fun(Ctx) ->

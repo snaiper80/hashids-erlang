@@ -28,7 +28,7 @@ hashids_context() = #hashids_context{salt = list(), min_length = non_neg_integer
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#alphabet-1">alphabet/1</a></td><td>returns adjusted custom alphabet from context.</td></tr><tr><td valign="top"><a href="#decode-2">decode/2</a></td><td>decode hash string.</td></tr><tr><td valign="top"><a href="#encode-2">encode/2</a></td><td>encode numbers.</td></tr><tr><td valign="top"><a href="#min_hash_length-1">min_hash_length/1</a></td><td>returns minimum hash length from context.</td></tr><tr><td valign="top"><a href="#new-0">new/0</a></td><td>make a new hashids context (convenient function).</td></tr><tr><td valign="top"><a href="#new-1">new/1</a></td><td>make a new hashids context.</td></tr><tr><td valign="top"><a href="#salt-1">salt/1</a></td><td>returns salt from context.</td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#alphabet-1">alphabet/1</a></td><td>returns adjusted custom alphabet from context.</td></tr><tr><td valign="top"><a href="#decode-2">decode/2</a></td><td>decode hash string.</td></tr><tr><td valign="top"><a href="#decode_hex-2">decode_hex/2</a></td><td>decode hash string to decoded hex string.</td></tr><tr><td valign="top"><a href="#encode-2">encode/2</a></td><td>encode numbers.</td></tr><tr><td valign="top"><a href="#encode_hex-2">encode_hex/2</a></td><td>encode hex string.</td></tr><tr><td valign="top"><a href="#min_hash_length-1">min_hash_length/1</a></td><td>returns minimum hash length from context.</td></tr><tr><td valign="top"><a href="#new-0">new/0</a></td><td>make a new hashids context (convenient function).</td></tr><tr><td valign="top"><a href="#new-1">new/1</a></td><td>make a new hashids context.</td></tr><tr><td valign="top"><a href="#salt-1">salt/1</a></td><td>returns salt from context.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -57,6 +57,17 @@ decode(Context::<a href="#type-hashids_context">hashids_context()</a>, HashStr::
 <br />
 
 decode hash string
+<a name="decode_hex-2"></a>
+
+### decode_hex/2 ###
+
+
+<pre><code>
+decode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, HashStr::string()) -&gt; string()
+</code></pre>
+<br />
+
+decode hash string to decoded hex string
 <a name="encode-2"></a>
 
 ### encode/2 ###
@@ -68,6 +79,17 @@ encode(Context::<a href="#type-hashids_context">hashids_context()</a>, N::intege
 <br />
 
 encode numbers
+<a name="encode_hex-2"></a>
+
+### encode_hex/2 ###
+
+
+<pre><code>
+encode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, Str::string()) -&gt; string()
+</code></pre>
+<br />
+
+encode hex string
 <a name="min_hash_length-1"></a>
 
 ### min_hash_length/1 ###
