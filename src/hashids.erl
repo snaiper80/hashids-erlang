@@ -4,6 +4,7 @@
          encode_hex/2, decode_hex/2,
          salt/1, alphabet/1, min_hash_length/1]).
 
+
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -export([consistent_shuffle/2, hash/2, unhash/2]).
@@ -98,8 +99,7 @@ decode(Context, HashStr) when is_list(HashStr) ->
 %% @spec decode_hex(hashids_context(), string()) -> string()
 -spec decode_hex(hashids_context(), string()) -> string().
 decode_hex(Context, HashStr) when is_list(HashStr) ->
-    DecodedNums = decode(Context, HashStr),
-    lists:concat([begin [_ | T] = integer_to_list(I, 16), T end || I <- DecodedNums]).
+    lists:concat([begin [_ | T] = integer_to_list(I, 16), T end || I <- decode(Context, HashStr)]).
 
 
 %% @doc returns salt from context
@@ -121,6 +121,7 @@ alphabet(Context) when is_record(Context, hashids_context) ->
 -spec min_hash_length(hashids_context()) -> non_neg_integer().
 min_hash_length(Context) when is_record(Context, hashids_context) ->
     Context#hashids_context.min_length.
+
 
 %% ===================================================================
 %% Private
@@ -395,6 +396,7 @@ parts(List, Max) ->
          [lists:reverse(E)|Acc]
      end, [], RevList).
 
+
 split_list(List, Max) ->
     element(1, lists:foldl(fun
         (E, {[Buff|Acc], C}) when C < Max ->
@@ -404,3 +406,4 @@ split_list(List, Max) ->
         (E, {[], _}) ->
             {[[E]], 1}
     end, {[], 0}, List)).
+
