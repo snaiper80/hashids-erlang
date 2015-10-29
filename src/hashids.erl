@@ -330,7 +330,7 @@ unhash_loop(Alphabet, Input, I, Num) ->
     Pos = string:chr(Alphabet, lists:nth(I, Input)),
     case Pos of
         0 ->
-            {error, cant_unhash};
+            {error, cannot_unhash};
         _ ->
             H = (Pos - 1) * trunc(math:pow(length(Alphabet), length(Input) - I)),
             unhash_loop(Alphabet, Input, I + 1, Num + H)

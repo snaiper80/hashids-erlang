@@ -192,7 +192,7 @@ decode_test_() ->
             fun(Ctx) ->
                     [
                         ?_assertException(error,
-                                          {badmatch, {error, cant_unhash}},
+                                          {badmatch, {error, cannot_unhash}},
                                            hashids:decode(Ctx, "asdf-'"))
                     ]
             end
