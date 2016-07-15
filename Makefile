@@ -9,7 +9,7 @@ REBAR = ./rebar3
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
-.PHONY: all clean distclean test coverage typer build_plt analysis edoc
+.PHONY: all clean distclean test coverage typer build_plt analysis edoc publish
 
 all: compile
 
@@ -22,6 +22,7 @@ clean:
 distclean: clean
 	@rm -rf ./_plt
 	@rm -rf ./_build
+	@rm -f ./TEST-*.xml
 
 test:
 ifeq ($(suite),)
@@ -45,3 +46,7 @@ analysis:
 edoc:
 	rm -rf ./doc
 	@$(REBAR) edoc
+
+publish:
+	@rm -f ./src/.DS_Store
+	./rebar3 hex publish
