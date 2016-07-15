@@ -24,7 +24,7 @@
 -export_type([hashids_context/0]).
 
 % Constants
--define(VERSION,              "1.0.1").
+-define(VERSION,              "1.0.3").
 
 -define(MIN_ALPHABET_LEN,     16).
 -define(SEP_DIV,              3.5).
