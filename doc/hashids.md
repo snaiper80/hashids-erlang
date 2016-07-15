@@ -5,8 +5,6 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-
-
 <a name="types"></a>
 
 ## Data Types ##
@@ -17,11 +15,9 @@
 ### <a name="type-hashids_context">hashids_context()</a> ###
 
 
-
 <pre><code>
 hashids_context() = #hashids_context{salt = list(), min_length = non_neg_integer(), alphabet = list(), seperators = list(), guards = list()}
 </code></pre>
-
 
 <a name="index"></a>
 
@@ -39,17 +35,16 @@ hashids_context() = #hashids_context{salt = list(), min_length = non_neg_integer
 
 ### alphabet/1 ###
 
-
 <pre><code>
 alphabet(Context::<a href="#type-hashids_context">hashids_context()</a>) -&gt; string()
 </code></pre>
 <br />
 
 returns adjusted custom alphabet from context
+
 <a name="decode-2"></a>
 
 ### decode/2 ###
-
 
 <pre><code>
 decode(Context::<a href="#type-hashids_context">hashids_context()</a>, HashStr::string()) -&gt; [integer(), ...]
@@ -57,10 +52,10 @@ decode(Context::<a href="#type-hashids_context">hashids_context()</a>, HashStr::
 <br />
 
 decode hash string
+
 <a name="decode_hex-2"></a>
 
 ### decode_hex/2 ###
-
 
 <pre><code>
 decode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, HashStr::string()) -&gt; string()
@@ -68,10 +63,10 @@ decode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, HashS
 <br />
 
 decode hash string to decoded hex string
+
 <a name="encode-2"></a>
 
 ### encode/2 ###
-
 
 <pre><code>
 encode(Context::<a href="#type-hashids_context">hashids_context()</a>, N::integer() | [integer(), ...]) -&gt; string()
@@ -79,10 +74,10 @@ encode(Context::<a href="#type-hashids_context">hashids_context()</a>, N::intege
 <br />
 
 encode numbers
+
 <a name="encode_hex-2"></a>
 
 ### encode_hex/2 ###
-
 
 <pre><code>
 encode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, Str::string()) -&gt; string()
@@ -90,10 +85,10 @@ encode_hex(Context::<a href="#type-hashids_context">hashids_context()</a>, Str::
 <br />
 
 encode hex string
+
 <a name="min_hash_length-1"></a>
 
 ### min_hash_length/1 ###
-
 
 <pre><code>
 min_hash_length(Context::<a href="#type-hashids_context">hashids_context()</a>) -&gt; non_neg_integer()
@@ -101,10 +96,10 @@ min_hash_length(Context::<a href="#type-hashids_context">hashids_context()</a>) 
 <br />
 
 returns minimum hash length from context
+
 <a name="new-0"></a>
 
 ### new/0 ###
-
 
 <pre><code>
 new() -&gt; <a href="#type-hashids_context">hashids_context()</a>
@@ -112,10 +107,10 @@ new() -&gt; <a href="#type-hashids_context">hashids_context()</a>
 <br />
 
 make a new hashids context (convenient function)
+
 <a name="new-1"></a>
 
 ### new/1 ###
-
 
 <pre><code>
 new(Opts::[] | [{salt | default_alphabet | min_hash_length, any()}]) -&gt; <a href="#type-hashids_context">hashids_context()</a>
@@ -123,10 +118,10 @@ new(Opts::[] | [{salt | default_alphabet | min_hash_length, any()}]) -&gt; <a hr
 <br />
 
 make a new hashids context
+
 <a name="salt-1"></a>
 
 ### salt/1 ###
-
 
 <pre><code>
 salt(Context::<a href="#type-hashids_context">hashids_context()</a>) -&gt; string()
@@ -134,3 +129,4 @@ salt(Context::<a href="#type-hashids_context">hashids_context()</a>) -&gt; strin
 <br />
 
 returns salt from context
+

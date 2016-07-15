@@ -1,6 +1,10 @@
 *.app
 *.beam
+TEST-*.xml
 .eunit
-.rebar
-deps
+_rel
+.rebar3
+_build
+_*
+_deps
 hashids_plt

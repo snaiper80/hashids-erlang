@@ -5,43 +5,33 @@ DEPS_PLT     = $(REPO)_plt
 DEF_PLT_APPS = sasl erts kernel stdlib eunit
 PLT_APPS     = $(DEF_PLT_APPS)
 
-# The release branch should have a file named USE_REBAR_LOCKED
-use_locked_config = $(wildcard USE_REBAR_LOCKED)
-ifeq ($(use_locked_config),USE_REBAR_LOCKED)
-  	rebar_config = rebar.config.locked
-else
-  	rebar_config = rebar.config
-endif
-REBAR = ./rebar -C $(rebar_config)
+REBAR = ./rebar3
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
-.PHONY: all deps clean distclean test coverage typer build_plt analysis edoc
+.PHONY: all clean distclean test coverage typer build_plt analysis edoc
 
-all: deps compile
-
-deps:
-	@$(REBAR) get-deps
+all: compile
 
 compile:
 	@$(REBAR) compile
 
 clean:
-	@rm -rf ./.eunit
-	@rm -rf ./.rebar
-	@rm -rf ./ebin
 	@$(REBAR) clean
 
 distclean: clean
-	@$(REBAR) delete-deps
+	@rm -rf ./_plt
+	@rm -rf ./_build
 
 test:
-	@rm -rf .eunit
-	@mkdir -p .eunit
-	@$(REBAR) -v skip_deps=true eunit
+ifeq ($(suite),)
+	@$(REBAR) do eunit, cover --verbose
+else
+	@$(REBAR) do eunit --suite $(suite), cover --verbose
+endif
 
 coverage:
-	@open ./.eunit/index.html
+	@open ./_build/test/cover/index.html
 
 typer:
 	@typer --plt $(DEPS_PLT) -r ./src
@@ -54,4 +44,4 @@ analysis:
 
 edoc:
 	rm -rf ./doc
-	@$(REBAR) skip_deps=true doc
+	@$(REBAR) edoc
