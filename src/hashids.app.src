@@ -2,5 +2,11 @@
     {description, "Hashids for erlang"},
     {vsn, git},
     {registered, []},
-    {applications, [kernel, stdlib]}
+    {applications, [kernel, stdlib]},
+    {pkg_name, "hashids-erlang"},
+    {maintainers, ["Lee GiTack"]},
+    {licenses, ["MIT"]},
+    {links, [
+        {"Github", "https://github.com/snaiper80/hashids-erlang"}
+    ]}
 ]}.
