@@ -53,11 +53,11 @@ new(Opts) ->
     valid = validate_alphabet(Alphabet),
     ok    = validate_salt(Salt),
 
-    io:format("~p~n", [Alphabet]),
+    error_logger:info_msg("~p~n", [Alphabet]),
     {Seps, ShuffledAlphabet}           = setup_sep(Alphabet, Salt),
-    io:format("~p ~p~n", [Seps, ShuffledAlphabet]),
+    error_logger:info_msg("~p ~p~n", [Seps, ShuffledAlphabet]),
     {Guards, FinalSeps, FinalAlphabet} = setup_guard(Seps, ShuffledAlphabet),
-    io:format("~p ~p~n", [FinalSeps, FinalAlphabet]),
+    error_logger:info_msg("~p ~p~n", [FinalSeps, FinalAlphabet]),
 
     % New HashID Context
     #hashids_context {
