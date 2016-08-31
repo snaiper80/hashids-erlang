@@ -16,7 +16,7 @@ Add Hashids as a dependency to rebar.config
 ```erlang
 {deps,
     [
-        {hashids, ".*",  {git, "git://github.com/snaiper80/hashids-erlang.git",  {tag, "1.0.2"}}}
+        {hashids, ".*",  {git, "git://github.com/snaiper80/hashids-erlang.git",  {tag, "1.0.4"}}}
     ]
 }.
 ```
