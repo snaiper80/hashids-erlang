@@ -322,18 +322,16 @@ hash_loop(N, Alphabet, Acc) ->
 
 
 unhash(Input, Alphabet) ->
-    {ok, Num} = unhash_loop(Alphabet, Input, 1, 0), Num.
+    {ok, Num} = unhash_loop(Alphabet, Input, 0), Num.
 
-unhash_loop(_, Input, I, Num) when I > length(Input)->
+unhash_loop(_, [], Num) ->
     {ok, Num};
-unhash_loop(Alphabet, Input, I, Num) ->
-    Pos = string:chr(Alphabet, lists:nth(I, Input)),
-    case Pos of
+unhash_loop(Alphabet, [H | T], Num) ->
+    case string:chr(Alphabet, H) of
         0 ->
             {error, cannot_unhash};
-        _ ->
-            H = (Pos - 1) * trunc(math:pow(length(Alphabet), length(Input) - I)),
-            unhash_loop(Alphabet, Input, I + 1, Num + H)
+        X ->
+            unhash_loop(Alphabet, T, Num * length(Alphabet) +  (X - 1))
     end.
 
 
