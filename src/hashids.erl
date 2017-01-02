@@ -322,19 +322,22 @@ hash_loop(N, Alphabet, Acc) ->
 
 
 unhash(Input, Alphabet) ->
-    {ok, Num} = unhash_loop(Alphabet, Input, 1, 0), Num.
-
-unhash_loop(_, Input, I, Num) when I > length(Input)->
-    {ok, Num};
-unhash_loop(Alphabet, Input, I, Num) ->
-    Pos = string:chr(Alphabet, lists:nth(I, Input)),
-    case Pos of
-        0 ->
-            {error, cannot_unhash};
-        _ ->
-            H = (Pos - 1) * trunc(math:pow(length(Alphabet), length(Input) - I)),
-            unhash_loop(Alphabet, Input, I + 1, Num + H)
-    end.
+    lists:foldl(
+      fun(Item, Carry) ->
+        Carry * length(Alphabet) + Item
+      end,
+      0,
+      lists:map(
+        fun(Item) ->
+          {ok, Y} =
+          case string:chr(Alphabet, Item) of
+            0 -> {error, cannot_unhash};
+            X -> {ok , X - 1}
+          end, Y
+        end,
+        Input
+      )
+    ).
 
 
 %% ===================================================================
